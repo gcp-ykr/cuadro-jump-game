@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuadro Jump Game</title>
+    <title>Dino Jump Game</title>
     <style>
         body {
             display: flex;
@@ -26,19 +26,22 @@
     </style>
 </head>
 <body>
-    <h1>Cuadro Jump Game</h1>
+    <h1>Dino Jump Game</h1>
     <canvas id="gameCanvas" width="600" height="200"></canvas>
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
+        // Load T-Rex image
+        const trexImage = new Image();
+        trexImage.src = 'trexdinopng.png';
+
         // Player
         const player = {
             x: 50,
             y: 150,
-            width: 20,
-            height: 20,
-            color: '#333',
+            width: 50,  // Increased size for the T-Rex
+            height: 50, // Increased size for the T-Rex
             velocityY: 0,
             isJumping: false
         };
@@ -49,8 +52,7 @@
         let score = 0;
 
         function drawPlayer() {
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.drawImage(trexImage, player.x, player.y, player.width, player.height);
         }
 
         function drawObstacles() {
@@ -85,7 +87,7 @@
                 const obstacleHeight = Math.random() * 30 + 20;
                 obstacles.push({
                     x: canvas.width,
-                    y: 170 - obstacleHeight,
+                    y: canvas.height - obstacleHeight, // Place obstacle on the floor
                     width: 20,
                     height: obstacleHeight
                 });
