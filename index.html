@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dino Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f7f7f7;
+            font-family: 'Arial', sans-serif;
+        }
+        canvas {
+            border: 2px solid #000;
+            background-color: #fff;
+        }
+        h1 {
+            position: absolute;
+            top: 20px;
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dino Game</h1>
+    <canvas id="gameCanvas" width="600" height="200"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Player
+        const player = {
+            x: 50,
+            y: 150,
+            width: 20,
+            height: 20,
+            color: '#333',
+            velocityY: 0,
+            isJumping: false
+        };
+
+        // Obstacles
+        const obstacles = [];
+        let frameCount = 0;
+        let score = 0;
+
+        function drawPlayer() {
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function drawObstacles() {
+            for (let i = 0; i < obstacles.length; i++) {
+                ctx.fillStyle = '#c00';
+                ctx.fillRect(obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height);
+            }
+        }
+
+        function drawScore() {
+            ctx.fillStyle = '#333';
+            ctx.font = '20px Arial';
+            ctx.fillText('Score: ' + score, 10, 20);
+        }
+
+        function update() {
+            // Player jump physics
+            if (player.isJumping) {
+                player.velocityY += 0.5; // Gravity
+                player.y += player.velocityY;
+
+                if (player.y > 150) {
+                    player.y = 150;
+                    player.isJumping = false;
+                    player.velocityY = 0;
+                }
+            }
+
+            // Obstacle logic
+            frameCount++;
+            if (frameCount % 100 === 0) {
+                const obstacleHeight = Math.random() * 30 + 20;
+                obstacles.push({
+                    x: canvas.width,
+                    y: 170 - obstacleHeight,
+                    width: 20,
+                    height: obstacleHeight
+                });
+            }
+
+            for (let i = 0; i < obstacles.length; i++) {
+                obstacles[i].x -= 3; // Move obstacles to the left
+
+                // Collision detection
+                if (
+                    player.x < obstacles[i].x + obstacles[i].width &&
+                    player.x + player.width > obstacles[i].x &&
+                    player.y < obstacles[i].y + obstacles[i].height &&
+                    player.y + player.height > obstacles[i].y
+                ) {
+                    alert('Game Over! Your score: ' + score);
+                    document.location.reload();
+                }
+                
+                // Remove off-screen obstacles
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.shift();
+                    score++;
+                }
+            }
+            
+            // Clear canvas and redraw
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            drawObstacles();
+            drawScore();
+
+            requestAnimationFrame(update);
+        }
+
+        // Handle player input
+        document.addEventListener('keydown', (e) => {
+            if ((e.code === 'Space' || e.code === 'ArrowUp') && !player.isJumping) {
+                player.isJumping = true;
+                player.velocityY = -12;
+            }
+        });
+
+        // Start the game loop
+        update();
+    </script>
+</body>
+</html>
